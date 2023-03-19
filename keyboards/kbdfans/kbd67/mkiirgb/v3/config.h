@@ -18,6 +18,14 @@
 
 #include "config_common.h"
 
+// when we use USB 3.0, a power unit is 6mA instead of 2mA.
+// but usb_descriptors presumes USB 2.0 with a unit of 2mA hence the given
+// power consumption is devided by two (POWER >> 1) in order to calculate the units.
+// Rather than updating usb_descriptor, we hack around it in the config here.
+// We want 600mA max (lets not overdo it), so we need 100 units aka (100 << 1) = 200 in USB 2.0 calculations.
+//#define USB_MAX_POWER_CONSUMPTION 200 // lets poke around a little
+//#define USB_VERSION VERSION_BCD(3, 0, 0)
+
 /* key matrix size */
 #define MATRIX_ROWS 5
 #define MATRIX_COLS 15
@@ -31,9 +39,10 @@
 #define DEBOUNCE 5
 
 #ifdef RGB_MATRIX_ENABLE
-#define RGB_DISABLE_WHEN_USB_SUSPENDED // turn off effects when suspended
-#define USB_SUSPEND_WAKEUP_DELAY 5000
-#define RGB_MATRIX_KEYPRESSES
+#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 200 // that should be default, lets see if that changes something
+#    define RGB_DISABLE_WHEN_USB_SUSPENDED // turn off effects when suspended
+#    define USB_SUSPEND_WAKEUP_DELAY 5000
+#    define RGB_MATRIX_KEYPRESSES
 // RGB Matrix Animation modes. Explicitly enabled
 // For full list of effects, see:
 // https://docs.qmk.fm/#/feature_rgb_matrix?id=rgb-matrix-effects
@@ -68,26 +77,26 @@
 #    define ENABLE_RGB_MATRIX_PIXEL_FRACTAL
 // enabled only if RGB_MATRIX_FRAMEBUFFER_EFFECTS is defined
 #    define ENABLE_RGB_MATRIX_TYPING_HEATMAP
-// #define ENABLE_RGB_MATRIX_DIGITAL_RAIN
+#    define ENABLE_RGB_MATRIX_DIGITAL_RAIN
 // enabled only of RGB_MATRIX_KEYPRESSES or RGB_MATRIX_KEYRELEASES is defined
-// #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
-// #define ENABLE_RGB_MATRIX_SOLID_REACTIVE
-// #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_WIDE
-// #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTIWIDE
-// #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_CROSS
-// #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
-// #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_NEXUS
-// #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTINEXUS
-// #define ENABLE_RGB_MATRIX_SPLASH
-// #define ENABLE_RGB_MATRIX_MULTISPLASH
-// #define ENABLE_RGB_MATRIX_SOLID_SPLASH
-// #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
+#    define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
+#    define ENABLE_RGB_MATRIX_SOLID_REACTIVE
+#    define ENABLE_RGB_MATRIX_SOLID_REACTIVE_WIDE
+#    define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTIWIDE
+#    define ENABLE_RGB_MATRIX_SOLID_REACTIVE_CROSS
+#    define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
+#    define ENABLE_RGB_MATRIX_SOLID_REACTIVE_NEXUS
+#    define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTINEXUS
+#    define ENABLE_RGB_MATRIX_SPLASH
+#    define ENABLE_RGB_MATRIX_MULTISPLASH
+// #    define ENABLE_RGB_MATRIX_SOLID_SPLASH
+#    define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 
 #define RGB_MATRIX_LED_PROCESS_LIMIT 4
 #define RGB_MATRIX_LED_FLUSH_LIMIT 26
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_CYCLE_ALL
 #define DRIVER_ADDR_1 0b0110000
 #define DRIVER_COUNT 1
-#define RGB_MATRIX_LED_COUNT 67
+#define RGB_MATRIX_LED_COUNT 67U
 #define DRIVER_INDICATOR_LED_TOTAL 0
 #endif
