@@ -18,13 +18,13 @@ NKRO_ENABLE = no            # Enable N-Key Rollover
 #NO_USB_STARTUP_CHECK = yes	# Disable initialization only when usb is plugged in
 
 RGB_MATRIX_ENABLE = yes
-# RGB_MATRIX_DRIVER = IS31FL3741
-RGB_MATRIX_DRIVER = custom  # Enable RGB matrix effects.
+RGB_MATRIX_DRIVER = IS31FL3741
+# RGB_MATRIX_DRIVER = custom  # Enable RGB matrix effects.
 RGBLIGHT_ENABLE = no
-COMMON_VPATH += $(DRIVER_PATH)/issi
+# COMMON_VPATH += $(DRIVER_PATH)/issi
 
 # project specific files
-SRC +=  drivers/led/issi/is31fl3741.c
+# SRC +=  drivers/led/issi/is31fl3741.c
 QUANTUM_LIB_SRC += i2c_master.c
 
 CONSOLE_ENABLE = yes
