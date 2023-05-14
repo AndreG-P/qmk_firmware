@@ -54,7 +54,8 @@
         "mousekey": false,
         "extrakey": true,
         "nkro": true,
-        "rgb_matrix": true
+        "rgb_matrix": true,
+        "console": true
     },
     "build": {
         "lto": true

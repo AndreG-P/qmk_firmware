@@ -8,44 +8,38 @@
 #define MATRIX_IO_DELAY 30
 
 /* key matrix size */
+#define DIRECT_PINS { { C1 }, { C0 } }
 
-#define MATRIX_ROWS 5
-#define MATRIX_COLS 18
+// #define MATRIX_ROWS 5
+// #define MATRIX_COLS 15
 
-#define MATRIX_ROW_PINS { B9,  B8, C10, C11, C12 }
-#define MATRIX_COL_PINS { C9,  C8,  C7,  C6, B15, B14, B13, B12, B10, B2, B1, B0, C5, C4, A7, A6, A5, A4 }
+// #define MATRIX_ROW_PINS {  B0,  A1, C14, C13,  A0}
+// #define MATRIX_COL_PINS { C15, B10,  B7,  B6,  B5,  B4, A15, A10,  A9,  A8, B15, B14, B13, B12,  B2}
 
-#define DIODE_DIRECTION COL2ROW
+// #define DIODE_DIRECTION COL2ROW
 #define DEBOUNCE    5
-
-#define ENCODERS_PAD_A { C1, C13 }
-#define ENCODERS_PAD_B { C2, C14 }
-#define ENCODER_RESOLUTIONS { 2, 2 }
 
 // i2c setting
 #define I2C_DRIVER          I2CD1
-#define I2C1_SCL_PIN        B6
-#define I2C1_SDA_PIN        B7
+#define I2C1_SCL_PIN        B8
+#define I2C1_SDA_PIN        B9
 #define I2C1_SCL_PAL_MODE   4
 #define I2C1_SDA_PAL_MODE   4
 #define I2C1_CLOCK_SPEED    400000
 #define I2C1_DUTY_CYCLE     FAST_DUTY_CYCLE_2
-#define PAL_MODE_STM32_ALTERNATE_OPENDRAIN ( PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN )
+#define PAL_MODE_STM32_ALTERNATE_OPENDRAIN (PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN)
 
 // rgb matrix setting
 #define DRIVER_ADDR_1 0b0110000 // 0x30, this must be the 7 bit address not the 8 bit address 0x60!
-#define DRIVER_ADDR_2 0b0110011
-#define DRIVER_COUNT 2
-#define DRIVER_1_LED_TOTAL 300
-#define DRIVER_2_LED_TOTAL 234
-#define RGB_MATRIX_LED_COUNT ( DRIVER_1_LED_TOTAL + DRIVER_2_LED_TOTAL )
+#define DRIVER_COUNT 1
+#define DRIVER_1_LED_TOTAL 4
+#define RGB_MATRIX_LED_COUNT DRIVER_1_LED_TOTAL
+
 
 #define ISSI_TIMEOUT 0xFF
 
-#define ISSI_GLOBALCURRENT 0xFF
-#define ISSI_PWM_FREQUENCY 0x90
-
-#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 100
+//#define ISSI_GLOBALCURRENT 0xFF
+//#define ISSI_PWM_FREQUENCY 0x90
 
 // RGB Matrix Animation modes. Explicitly enabled
 // For full list of effects, see:
@@ -76,8 +70,8 @@
 #    define ENABLE_RGB_MATRIX_HUE_BREATHING
 #    define ENABLE_RGB_MATRIX_HUE_PENDULUM
 #    define ENABLE_RGB_MATRIX_HUE_WAVE
-// #    define ENABLE_RGB_MATRIX_PIXEL_RAIN
-// #    define ENABLE_RGB_MATRIX_PIXEL_FLOW
+#    define ENABLE_RGB_MATRIX_PIXEL_RAIN
+#    define ENABLE_RGB_MATRIX_PIXEL_FLOW
 // #    define ENABLE_RGB_MATRIX_PIXEL_FRACTAL
 // enabled only if RGB_MATRIX_FRAMEBUFFER_EFFECTS is defined
 #    define ENABLE_RGB_MATRIX_TYPING_HEATMAP
