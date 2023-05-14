@@ -461,12 +461,12 @@ void rgb_matrix_indicators_advanced(effect_params_t *params) {
      * rgb_task_render, right before the iter++ line.
      */
 #if defined(RGB_MATRIX_LED_PROCESS_LIMIT) && RGB_MATRIX_LED_PROCESS_LIMIT > 0 && RGB_MATRIX_LED_PROCESS_LIMIT < RGB_MATRIX_LED_COUNT
-    uint8_t min = RGB_MATRIX_LED_PROCESS_LIMIT * (params->iter - 1);
-    uint8_t max = min + RGB_MATRIX_LED_PROCESS_LIMIT;
+    uint16_t min = RGB_MATRIX_LED_PROCESS_LIMIT * (params->iter - 1);
+    uint16_t max = min + RGB_MATRIX_LED_PROCESS_LIMIT;
     if (max > RGB_MATRIX_LED_COUNT) max = RGB_MATRIX_LED_COUNT;
 #else
-    uint8_t min = 0;
-    uint8_t max = RGB_MATRIX_LED_COUNT;
+    uint16_t min = 0;
+    uint16_t max = RGB_MATRIX_LED_COUNT;
 #endif
     rgb_matrix_indicators_advanced_kb(min, max);
 }
