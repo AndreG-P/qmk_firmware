@@ -15,6 +15,9 @@
  */
 
 #include_next <mcuconf.h>
+
+#undef STM32_I2C_USE_I2C1
+#define STM32_I2C_USE_I2C1 TRUE
 /* Set PLL M divider from 4 (F411 GENERIC default) to 12, because of 24 MHz crystal on board
     See HSE setting in config.h
 */
