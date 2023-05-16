@@ -61,8 +61,8 @@
             if (!(is_keyboard_left()) && (min < k_rgb_matrix_split[0])) min = k_rgb_matrix_split[0];
 #    else
 #        define RGB_MATRIX_USE_LIMITS(min, max)                        \
-            uint16_t min = RGB_MATRIX_LED_PROCESS_LIMIT * params->iter; \
-            uint16_t max = min + RGB_MATRIX_LED_PROCESS_LIMIT;          \
+            uint8_t min = RGB_MATRIX_LED_PROCESS_LIMIT * params->iter; \
+            uint8_t max = min + RGB_MATRIX_LED_PROCESS_LIMIT;          \
             if (max > RGB_MATRIX_LED_COUNT) max = RGB_MATRIX_LED_COUNT;
 #    endif
 #else
