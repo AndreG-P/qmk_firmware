@@ -37,18 +37,25 @@
 #define PAL_MODE_STM32_ALTERNATE_OPENDRAIN ( PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN )
 
 // rgb matrix setting
-#define DRIVER_ADDR_1 0b0110000 // 0x30, this must be the 7 bit address not the 8 bit address 0x60!
-#define DRIVER_ADDR_2 0b0110011
-#define DRIVER_COUNT 2
+#define IS31FL3741_I2C_ADDRESS_1 IS31FL3741_I2C_ADDRESS_GND // 0x30, this must be the 7 bit address not the 8 bit address 0x60!
+#define IS31FL3741_I2C_ADDRESS_2 IS31FL3741_I2C_ADDRESS_VCC
+// #define DRIVER_COUNT 2 // no longer necessary
 #define DRIVER_1_LED_TOTAL 102
 #define DRIVER_2_LED_TOTAL 78
 // #define RGB_MATRIX_LED_COUNT ( DRIVER_1_LED_TOTAL )
 #define RGB_MATRIX_LED_COUNT ( DRIVER_1_LED_TOTAL + DRIVER_2_LED_TOTAL )
 
-// #define ISSI_TIMEOUT 0xFF
+// #define IS31FL3741_I2C_TIMEOUT 0xFF
 
-#define ISSI_GLOBALCURRENT 0xFF
-#define ISSI_PWM_FREQUENCY 0x90
+#define IS31FL3741_GLOBAL_CURRENT 0xFF
+#define IS31FL3741_PWM_FREQUENCY 0x90
+
+// Not entirely sure why they set the default to 32K for UP/DN
+// I didnt install any res on the board, my STM32 bare metal program didnt
+// set any res either and all other ISSI define 0Ohm as default...
+// So we go with 0 zero.
+#define IS31FL3741_SW_PULLUP IS31FL3741_PUR_0_OHM
+#define IS31FL3741_CS_PULLDOWN IS31FL3741_PDR_0_OHM
 
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 100
 #define RGB_MATRIX_DEFAULT_VAL 80

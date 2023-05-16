@@ -28,7 +28,219 @@
  * be here if shared between boards.
  */
 
+<<<<<<< HEAD
 #if defined(RGB_MATRIX_IS31FL3218)
+=======
+#if defined(IS31FL3731) || defined(IS31FL3733) || defined(IS31FL3737) || defined(IS31FL3741) || defined(IS31FLCOMMON) || defined(CKLED2001)
+#    include "i2c_master.h"
+
+// TODO: Remove this at some later date
+#    if defined(DRIVER_ADDR_1) && defined(DRIVER_ADDR_2)
+#        if DRIVER_ADDR_1 == DRIVER_ADDR_2
+#            error "Setting DRIVER_ADDR_2 == DRIVER_ADDR_1 is obsolete. If you are only using one ISSI driver, set DRIVER_COUNT to 1 and remove DRIVER_ADDR_2"
+#        endif
+#    endif
+
+static void init(void) {
+    i2c_init();
+
+#    if defined(IS31FL3731)
+    IS31FL3731_init(DRIVER_ADDR_1);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL3731_init(DRIVER_ADDR_2);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL3731_init(DRIVER_ADDR_3);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL3731_init(DRIVER_ADDR_4);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(IS31FL3733)
+#        if !defined(DRIVER_SYNC_1)
+#            define DRIVER_SYNC_1 0
+#        endif
+    IS31FL3733_init(DRIVER_ADDR_1, DRIVER_SYNC_1);
+#        if defined(DRIVER_ADDR_2)
+#            if !defined(DRIVER_SYNC_2)
+#                define DRIVER_SYNC_2 0
+#            endif
+    IS31FL3733_init(DRIVER_ADDR_2, DRIVER_SYNC_2);
+#            if defined(DRIVER_ADDR_3)
+#                if !defined(DRIVER_SYNC_3)
+#                    define DRIVER_SYNC_3 0
+#                endif
+    IS31FL3733_init(DRIVER_ADDR_3, DRIVER_SYNC_3);
+#                if defined(DRIVER_ADDR_4)
+#                    if !defined(DRIVER_SYNC_4)
+#                        define DRIVER_SYNC_4 0
+#                    endif
+    IS31FL3733_init(DRIVER_ADDR_4, DRIVER_SYNC_4);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(IS31FL3737)
+    IS31FL3737_init(DRIVER_ADDR_1);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL3737_init(DRIVER_ADDR_2);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL3737_init(DRIVER_ADDR_3);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL3737_init(DRIVER_ADDR_4);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(IS31FL3741)
+    IS31FL3741_init(DRIVER_ADDR_1);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL3741_init(DRIVER_ADDR_2);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL3741_init(DRIVER_ADDR_3);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL3741_init(DRIVER_ADDR_4);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(IS31FLCOMMON)
+    IS31FL_common_init(DRIVER_ADDR_1, ISSI_SSR_1);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL_common_init(DRIVER_ADDR_2, ISSI_SSR_2);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL_common_init(DRIVER_ADDR_3, ISSI_SSR_3);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL_common_init(DRIVER_ADDR_4, ISSI_SSR_4);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(CKLED2001)
+    CKLED2001_init(DRIVER_ADDR_1);
+#        if defined(DRIVER_ADDR_2)
+    CKLED2001_init(DRIVER_ADDR_2);
+#            if defined(DRIVER_ADDR_3)
+    CKLED2001_init(DRIVER_ADDR_3);
+#                if defined(DRIVER_ADDR_4)
+    CKLED2001_init(DRIVER_ADDR_4);
+#                endif
+#            endif
+#        endif
+#    endif
+
+    for (int index = 0; index < RGB_MATRIX_LED_COUNT; index++) {
+        bool enabled = true;
+
+        // This only caches it for later
+#    if defined(IS31FL3731)
+        IS31FL3731_set_led_control_register(index, enabled, enabled, enabled);
+#    elif defined(IS31FL3733)
+        IS31FL3733_set_led_control_register(index, enabled, enabled, enabled);
+#    elif defined(IS31FL3737)
+        IS31FL3737_set_led_control_register(index, enabled, enabled, enabled);
+#    elif defined(IS31FL3741)
+        IS31FL3741_set_led_control_register(index, enabled, enabled, enabled);
+#    elif defined(IS31FLCOMMON)
+        IS31FL_RGB_set_scaling_buffer(index, enabled, enabled, enabled);
+#    elif defined(CKLED2001)
+        CKLED2001_set_led_control_register(index, enabled, enabled, enabled);
+#    endif
+    }
+
+    // This actually updates the LED drivers
+#    if defined(IS31FL3731)
+    IS31FL3731_update_led_control_registers(DRIVER_ADDR_1, 0);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL3731_update_led_control_registers(DRIVER_ADDR_2, 1);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL3731_update_led_control_registers(DRIVER_ADDR_3, 2);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL3731_update_led_control_registers(DRIVER_ADDR_4, 3);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(IS31FL3733)
+    IS31FL3733_update_led_control_registers(DRIVER_ADDR_1, 0);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL3733_update_led_control_registers(DRIVER_ADDR_2, 1);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL3733_update_led_control_registers(DRIVER_ADDR_3, 2);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL3733_update_led_control_registers(DRIVER_ADDR_4, 3);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(IS31FL3737)
+    IS31FL3737_update_led_control_registers(DRIVER_ADDR_1, 0);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL3737_update_led_control_registers(DRIVER_ADDR_2, 1);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL3737_update_led_control_registers(DRIVER_ADDR_3, 2);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL3737_update_led_control_registers(DRIVER_ADDR_4, 3);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(IS31FL3741)
+    IS31FL3741_update_led_control_registers(DRIVER_ADDR_1, 0);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL3741_update_led_control_registers(DRIVER_ADDR_2, 1);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL3741_update_led_control_registers(DRIVER_ADDR_3, 2);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL3741_update_led_control_registers(DRIVER_ADDR_4, 3);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(IS31FLCOMMON)
+#        ifdef ISSI_MANUAL_SCALING
+    IS31FL_set_manual_scaling_buffer();
+#        endif
+    IS31FL_common_update_scaling_register(DRIVER_ADDR_1, 0);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL_common_update_scaling_register(DRIVER_ADDR_2, 1);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL_common_update_scaling_register(DRIVER_ADDR_3, 2);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL_common_update_scaling_register(DRIVER_ADDR_4, 3);
+#                endif
+#            endif
+#        endif
+
+#    elif defined(CKLED2001)
+    CKLED2001_update_led_control_registers(DRIVER_ADDR_1, 0);
+#        if defined(DRIVER_ADDR_2)
+    CKLED2001_update_led_control_registers(DRIVER_ADDR_2, 1);
+#            if defined(DRIVER_ADDR_3)
+    CKLED2001_update_led_control_registers(DRIVER_ADDR_3, 2);
+#                if defined(DRIVER_ADDR_4)
+    CKLED2001_update_led_control_registers(DRIVER_ADDR_4, 3);
+#                endif
+#            endif
+#        endif
+#    endif
+}
+
+#    if defined(IS31FL3731)
+static void flush(void) {
+    IS31FL3731_update_pwm_buffers(DRIVER_ADDR_1, 0);
+#        if defined(DRIVER_ADDR_2)
+    IS31FL3731_update_pwm_buffers(DRIVER_ADDR_2, 1);
+#            if defined(DRIVER_ADDR_3)
+    IS31FL3731_update_pwm_buffers(DRIVER_ADDR_3, 2);
+#                if defined(DRIVER_ADDR_4)
+    IS31FL3731_update_pwm_buffers(DRIVER_ADDR_4, 3);
+#                endif
+#            endif
+#        endif
+}
+
+>>>>>>> b64beab401 (Add IS31FL3731 multi driver support)
 const rgb_matrix_driver_t rgb_matrix_driver = {
     .init          = is31fl3218_init,
     .flush         = is31fl3218_update_pwm_buffers,
