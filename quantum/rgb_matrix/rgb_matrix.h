@@ -90,6 +90,7 @@
 #    define RGB_MATRIX_LED_PROCESS_LIMIT ((RGB_MATRIX_LED_COUNT + 4) / 5)
 #endif
 
+
 struct rgb_matrix_limits_t {
     uint8_t led_min_index;
     uint8_t led_max_index;

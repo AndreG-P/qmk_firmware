@@ -5,7 +5,7 @@
 
 #pragma once
 
-#define MATRIX_IO_DELAY 30
+#define MATRIX_IO_DELAY 10
 
 /* key matrix size */
 
@@ -16,7 +16,7 @@
 #define MATRIX_COL_PINS { C9,  C8,  C7,  C6, B15, B14, B13, B12, B10, B2, B1, B0, C5, C4, A7, A6, A5, A4 }
 
 #define DIODE_DIRECTION COL2ROW
-#define DEBOUNCE    5
+#define DEBOUNCE    2
 
 #define ENCODERS_PAD_A { C1, C13 }
 #define ENCODERS_PAD_B { C2, C14 }
@@ -27,14 +27,14 @@
 #define STM32_HSECLK 24000000
 
 // i2c setting
-// #define I2C_DRIVER          I2CD1
-// #define I2C1_SCL_PIN        B6
-// #define I2C1_SDA_PIN        B7
-// #define I2C1_SCL_PAL_MODE   4
-// #define I2C1_SDA_PAL_MODE   4
-// #define I2C1_CLOCK_SPEED    400000
-// #define I2C1_DUTY_CYCLE     FAST_DUTY_CYCLE_2
-// #define PAL_MODE_STM32_ALTERNATE_OPENDRAIN ( PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN )
+#define I2C_DRIVER          I2CD1
+#define I2C1_SCL_PIN        B6
+#define I2C1_SDA_PIN        B7
+#define I2C1_SCL_PAL_MODE   4
+#define I2C1_SDA_PAL_MODE   4
+#define I2C1_CLOCK_SPEED    400000
+#define I2C1_DUTY_CYCLE     FAST_DUTY_CYCLE_2
+#define PAL_MODE_STM32_ALTERNATE_OPENDRAIN ( PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN )
 
 // rgb matrix setting
 #define DRIVER_ADDR_1 0b0110000 // 0x30, this must be the 7 bit address not the 8 bit address 0x60!
