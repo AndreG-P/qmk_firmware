@@ -22,10 +22,6 @@
 #define ENCODERS_PAD_B { C2, C14 }
 #define ENCODER_RESOLUTIONS { 2, 2 }
 
-// Having a 24MHz crystal on the board
-// Setting PMML factor in mcuconf.h
-#define STM32_HSECLK 24000000
-
 // i2c setting
 #define I2C_DRIVER          I2CD1
 #define I2C1_SCL_PIN        B6
