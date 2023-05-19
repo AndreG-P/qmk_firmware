@@ -140,6 +140,9 @@ void is31fl3741_set_pwm_buffer(const is31fl3741_led_t *pled, uint8_t red, uint8_
 
 void is31fl3741_flush(void);
 
+uint8_t IS31FL3741_get_pwm(uint8_t driver_id, uint8_t index);
+uint8_t IS31FL3741_get_scaling(uint8_t driver_id, uint8_t index);
+
 #define IS31FL3741_PDR_0_OHM 0b000   // No pull-down resistor
 #define IS31FL3741_PDR_0K5_OHM 0b001 // 0.5 kOhm resistor
 #define IS31FL3741_PDR_1K_OHM 0b010  // 1 kOhm resistor

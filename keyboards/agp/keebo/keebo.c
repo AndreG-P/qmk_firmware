@@ -1,13 +1,14 @@
 
 #include "keebo.h"
+#include "is31fl3741.h"
 #include "print.h"
 
 bool encoder_update_kb(uint8_t index, bool clockwise) {
     if (index == 0) { /* First encoder */
         if (clockwise) {
-            tap_code_delay(KC_VOLU, 10);
+            tap_code_delay(KC_VOLU, 1);
         } else {
-            tap_code_delay(KC_VOLD, 10);
+            tap_code_delay(KC_VOLD, 1);
         }
     } else if (index == 1) { /* Second encoder */
         if (clockwise) {
@@ -21,7 +22,48 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
 
 #ifdef RGB_MATRIX_ENABLE
 
-#define CAPS_LOCK_LED_INDEX 35
+// THEORETISCH 136
+#define CAPS_LOCK_LED_INDEX { 34, 136, 117 }
+#define NUM_CAPS_LOCK_LEDS ARRAY_SIZE(((int[])CAPS_LOCK_LED_INDEX))
+
+#ifdef RGB_MATRIX_MAXIMUM_BRIGHTNESS
+    #define CAPS_LOCK_MAX_BRIGHTNESS RGB_MATRIX_MAXIMUM_BRIGHTNESS
+#else
+    #define CAPS_LOCK_MAX_BRIGHTNESS 0xFF
+#endif
+
+#ifdef RGB_MATRIX_VAL_STEP
+    #define CAPS_LOCK_VAL_STEP RGB_MATRIX_VAL_STEP
+#else
+    #define CAPS_LOCK_VAL_STEP 8
+#endif
+
+bool rgb_matrix_indicators_kb(void) {
+    if (!rgb_matrix_indicators_user()) {
+        return false;
+    }
+
+    if (host_keyboard_led_state().caps_lock) {
+        uint8_t caps_leds[NUM_CAPS_LOCK_LEDS] = CAPS_LOCK_LED_INDEX;
+        uint8_t b = rgb_matrix_get_val();
+        if (b < CAPS_LOCK_VAL_STEP) {
+            b = CAPS_LOCK_VAL_STEP;
+        } else if (b < (CAPS_LOCK_MAX_BRIGHTNESS - CAPS_LOCK_VAL_STEP)) {
+            b += CAPS_LOCK_VAL_STEP;  // one step more than current brightness
+        } else {
+            b = CAPS_LOCK_MAX_BRIGHTNESS;
+
+            uint8_t pwm = IS31FL3741_get_pwm(1, 117);
+            uint8_t scaling = IS31FL3741_get_scaling(1, 117);
+            uprintf( "LED 117 PWM: 0x%02X and Scaling: 0x%02X\n", pwm, scaling );
+        }
+        for ( uint8_t led_idx = 0; led_idx < NUM_CAPS_LOCK_LEDS; led_idx++ ) {
+            rgb_matrix_set_color(caps_leds[led_idx], b, b, b); // white, with the adjusted brightness
+        }
+    }
+
+    return true;
+}
 
 #define __ NO_LED
 
@@ -117,14 +159,14 @@ const is31_led PROGMEM g_is31_leds[RGB_MATRIX_LED_COUNT] = {
     {0, CS9_SW9,   CS8_SW9,   CS7_SW9},  // Space L
     {0, CS12_SW9,  CS11_SW9,  CS10_SW9}, // Space M
     {0, CS15_SW9,  CS14_SW9,  CS13_SW9}, // Space R
-    {0, CS18_SW9,  CS17_SW9,  CS16_SW9}, // Fn
-    {0, CS18_SW8,  CS17_SW8,  CS16_SW8}, // Alt R
-    {0, CS21_SW9,  CS20_SW9,  CS19_SW9}, // Win
-    {0, CS21_SW8,  CS20_SW8,  CS19_SW8}, // Left
-    {0, CS24_SW9,  CS23_SW9,  CS22_SW9}, // UP
-    {0, CS24_SW8,  CS23_SW8,  CS22_SW8}, // FN
-    {0, CS27_SW9,  CS26_SW9,  CS25_SW9}, // F4
-    {0, CS27_SW8,  CS26_SW8,  CS25_SW8}, // F9 // 80
+    {0, CS18_SW9,  CS17_SW9,  CS16_SW9}, //
+    {0, CS18_SW8,  CS17_SW8,  CS16_SW8}, //
+    {0, CS21_SW9,  CS20_SW9,  CS19_SW9}, //
+    {0, CS21_SW8,  CS20_SW8,  CS19_SW8}, //
+    {0, CS24_SW9,  CS23_SW9,  CS22_SW9}, //
+    {0, CS24_SW8,  CS23_SW8,  CS22_SW8}, //
+    {0, CS27_SW9,  CS26_SW9,  CS25_SW9}, // F5
+    {0, CS27_SW8,  CS26_SW8,  CS25_SW8}, // F10 // 80
 
 // Window
     {0, CS33_SW3,  CS32_SW3,  CS31_SW3}, // 81
@@ -143,7 +185,7 @@ const is31_led PROGMEM g_is31_leds[RGB_MATRIX_LED_COUNT] = {
     {0, CS30_SW8,  CS29_SW8,  CS28_SW8},
     {0, CS30_SW9,  CS29_SW9,  CS28_SW9},
 
-    {0, CS36_SW1,  CS35_SW1,  CS34_SW1}, // Center Top L (near *) now counter clockwise
+    {0, CS36_SW1,  CS35_SW1,  CS34_SW1}, // Center Top L (near *) now counter clockwise // 94
     {0, CS36_SW2,  CS35_SW2,  CS34_SW2},
     {0, CS36_SW4,  CS35_SW4,  CS34_SW4},
     {0, CS36_SW3,  CS35_SW3,  CS34_SW3},
@@ -156,103 +198,99 @@ const is31_led PROGMEM g_is31_leds[RGB_MATRIX_LED_COUNT] = {
 
 // ISSI 2 Bottom LEDs
 // ROW 1
-    {1, CS36_SW1,  CS35_SW1,  CS34_SW1},
-    {1, CS36_SW2,  CS35_SW2,  CS34_SW2},
-    {1, CS39_SW1,  CS38_SW1,  CS37_SW1},
-    {1, CS39_SW2,  CS38_SW2,  CS37_SW2},
+    {1, CS21_SW1,  CS20_SW1,  CS19_SW1}, // 103
+    {1, CS21_SW2,  CS20_SW2,  CS19_SW2},
+    {1, CS18_SW1,  CS17_SW1,  CS16_SW1},
+    {1, CS18_SW2,  CS17_SW2,  CS16_SW2},
+    {1, CS15_SW1,  CS14_SW1,  CS13_SW1},
+    {1, CS15_SW2,  CS14_SW2,  CS13_SW2},
+    {1, CS12_SW1,  CS11_SW1,  CS10_SW1},
+    {1, CS12_SW2,  CS11_SW2,  CS10_SW2},
     {1, CS3_SW1,   CS2_SW1,   CS1_SW1},
     {1, CS3_SW2,   CS2_SW2,   CS1_SW2},
     {1, CS6_SW1,   CS5_SW1,   CS4_SW1},
     {1, CS6_SW2,   CS5_SW2,   CS4_SW2},
     {1, CS9_SW1,   CS8_SW1,   CS7_SW1},
     {1, CS9_SW2,   CS8_SW2,   CS7_SW2},
-    {1, CS12_SW1,  CS11_SW1,  CS10_SW1},
-    {1, CS12_SW2,  CS11_SW2,  CS10_SW2},
-    {1, CS15_SW1,  CS14_SW1,  CS13_SW1},
-    {1, CS15_SW2,  CS14_SW2,  CS13_SW2},
-    {1, CS18_SW1,  CS17_SW1,  CS16_SW1},
-    {1, CS18_SW2,  CS17_SW2,  CS16_SW2},
-    {1, CS21_SW1,  CS20_SW1,  CS19_SW1},
+    {1, CS39_SW1,  CS38_SW1,  CS37_SW1},
+    {1, CS39_SW2,  CS38_SW2,  CS37_SW2}, // 118
+    {1, CS36_SW1,  CS35_SW1,  CS34_SW1},
 
 // ROW 2
-    {1, CS36_SW3,  CS35_SW3,  CS34_SW3},
-    {1, CS36_SW4,  CS35_SW4,  CS34_SW4},
-    {1, CS39_SW3,  CS38_SW3,  CS37_SW3},
-    {1, CS39_SW4,  CS38_SW4,  CS37_SW4},
+    {1, CS21_SW3,  CS20_SW3,  CS19_SW3}, // 120
+    {1, CS21_SW4,  CS20_SW4,  CS19_SW4},
+    {1, CS18_SW3,  CS17_SW3,  CS16_SW3},
+    {1, CS18_SW4,  CS17_SW4,  CS16_SW4},
+    {1, CS15_SW3,  CS14_SW3,  CS13_SW3},
+    {1, CS15_SW4,  CS14_SW4,  CS13_SW4},
+    {1, CS12_SW3,  CS11_SW3,  CS10_SW3},
+    {1, CS12_SW4,  CS11_SW4,  CS10_SW4},
     {1, CS3_SW3,   CS2_SW3,   CS1_SW3},
     {1, CS3_SW4,   CS2_SW4,   CS1_SW4},
     {1, CS6_SW3,   CS5_SW3,   CS4_SW3},
     {1, CS6_SW4,   CS5_SW4,   CS4_SW4},
     {1, CS9_SW3,   CS8_SW3,   CS7_SW3},
     {1, CS9_SW4,   CS8_SW4,   CS7_SW4},
-    {1, CS12_SW3,  CS11_SW3,  CS10_SW3},
-    {1, CS12_SW4,  CS11_SW4,  CS10_SW4},
-    {1, CS15_SW3,  CS14_SW3,  CS13_SW3},
-    {1, CS15_SW4,  CS14_SW4,  CS13_SW4},
-    {1, CS18_SW3,  CS17_SW3,  CS16_SW3},
-    {1, CS18_SW4,  CS17_SW4,  CS16_SW4},
-    {1, CS21_SW3,  CS20_SW3,  CS19_SW3},
+    {1, CS39_SW3,  CS38_SW3,  CS37_SW3},
+    {1, CS39_SW4,  CS38_SW4,  CS37_SW4},
+    {1, CS36_SW3,  CS35_SW3,  CS34_SW3},
 
 // ROW 3
-    {1, CS36_SW5,  CS35_SW5,  CS34_SW5}, // Caps
-    {1, CS36_SW6,  CS35_SW6,  CS34_SW6}, // A
-    {1, CS39_SW5,  CS38_SW5,  CS37_SW5}, // S
-    {1, CS39_SW6,  CS38_SW6,  CS37_SW6}, // D
-    {1, CS3_SW5,   CS2_SW5,   CS1_SW5},  // F
-    {1, CS3_SW6,   CS2_SW6,   CS1_SW6},  // G
-    {1, CS6_SW5,   CS5_SW5,   CS4_SW5},  // H
-    {1, CS6_SW6,   CS5_SW6,   CS4_SW6},  // J
-    {1, CS9_SW5,   CS8_SW5,   CS7_SW5},  // K
-    {1, CS9_SW6,   CS8_SW6,   CS7_SW6},  // L
-    {1, CS12_SW5,  CS11_SW5,  CS10_SW5}, // ;
-    {1, CS15_SW5,  CS14_SW5,  CS13_SW5}, // "
-    {1, CS15_SW6,  CS14_SW6,  CS13_SW6}, // Enter
-    {1, CS18_SW5,  CS17_SW5,  CS16_SW5}, // End
-    {1, CS21_SW5,  CS20_SW5,  CS19_SW5}, // F3
-    {1, CS21_SW4,  CS20_SW4,  CS19_SW4}, // F8
+    {1, CS21_SW5,  CS20_SW5,  CS19_SW5}, // Caps // 137
+    {1, CS21_SW6,  CS20_SW6,  CS19_SW6}, // A
+    {1, CS18_SW5,  CS17_SW5,  CS16_SW5}, // S
+    {1, CS18_SW6,  CS17_SW6,  CS16_SW6}, // D
+    {1, CS15_SW5,  CS14_SW5,  CS13_SW5},  // F
+    {1, CS15_SW6,  CS14_SW6,  CS13_SW6},  // G
+    {1, CS12_SW5,  CS11_SW5,  CS10_SW5},  // H
+    {1, CS12_SW6,  CS11_SW6,  CS10_SW6},  // J
+    {1, CS3_SW5,   CS2_SW5,   CS1_SW5},  // K
+    {1, CS3_SW6,   CS2_SW6,   CS1_SW6},  // L
+    {1, CS6_SW5,   CS5_SW5,   CS4_SW5}, // ;
+    {1, CS9_SW5,   CS8_SW5,   CS7_SW5}, // "
+    {1, CS9_SW6,   CS8_SW6,   CS7_SW6}, // Enter
+    {1, CS39_SW5,  CS38_SW5,  CS37_SW5}, // End
+    {1, CS36_SW5,  CS35_SW5,  CS34_SW5}, // F3
+    {1, CS36_SW4,  CS35_SW4,  CS34_SW4}, // F8
 
 // ROW 4
-    {1, CS36_SW7,  CS35_SW7,  CS34_SW7}, // Shift L
-    {1, CS39_SW8,  CS38_SW8,  CS37_SW8}, // Z
-    {1, CS39_SW7,  CS38_SW7,  CS37_SW7}, // X
-    {1, CS3_SW8,   CS2_SW8,   CS1_SW8},  // C
-    {1, CS3_SW7,   CS2_SW7,   CS1_SW7},  // V
-    {1, CS6_SW8,   CS5_SW8,   CS4_SW8},  // B
-    {1, CS6_SW7,   CS5_SW7,   CS4_SW7},  // N
-    {1, CS9_SW8,   CS8_SW8,   CS7_SW8},  // M
-    {1, CS9_SW7,   CS8_SW7,   CS7_SW7},  // <
-    {1, CS12_SW6,  CS11_SW6,  CS10_SW6}, // >
-    {1, CS12_SW7,  CS11_SW7,  CS10_SW7}, // ?
-    {1, CS15_SW7,  CS14_SW7,  CS13_SW7}, // Shift R
-    {1, CS18_SW6,  CS17_SW6,  CS16_SW6}, // Up
-    {1, CS18_SW7,  CS17_SW7,  CS16_SW7}, // Fn
-    {1, CS21_SW6,  CS20_SW6,  CS19_SW6}, // F4
-    {1, CS21_SW7,  CS20_SW7,  CS19_SW7}, // F9
+    {1, CS21_SW7,  CS20_SW7,  CS19_SW7}, // Shift L
+    {1, CS18_SW8,  CS17_SW8,  CS16_SW8}, // Z
+    {1, CS18_SW7,  CS17_SW7,  CS16_SW7}, // X
+    {1, CS15_SW8,  CS14_SW8,  CS13_SW8},  // C
+    {1, CS15_SW7,  CS14_SW7,  CS13_SW7},  // V
+    {1, CS12_SW8,  CS11_SW8,  CS10_SW8},  // B
+    {1, CS12_SW7,  CS11_SW7,  CS10_SW7},  // N
+    {1, CS3_SW8,   CS2_SW8,   CS1_SW8},  // M
+    {1, CS3_SW7,   CS2_SW7,   CS1_SW7},  // <
+    {1, CS6_SW6,   CS5_SW6,   CS4_SW6}, // >
+    {1, CS6_SW7,   CS5_SW7,   CS4_SW7}, // ?
+    {1, CS9_SW7,   CS8_SW7,   CS7_SW7}, // Shift R
+    {1, CS39_SW6,  CS38_SW6,  CS37_SW6}, // Up
+    {1, CS39_SW7,  CS38_SW7,  CS37_SW7}, // Fn
+    {1, CS36_SW6,  CS35_SW6,  CS34_SW6}, // F4
+    {1, CS36_SW7,  CS35_SW7,  CS34_SW7}, // F9
 
 // ROW 5
-    {1, CS36_SW8,  CS35_SW8,  CS34_SW8}, // Ctrl
-    {1, CS36_SW9,  CS35_SW9,  CS34_SW9}, // Win
-    {1, CS39_SW9,  CS38_SW9,  CS37_SW9}, // Alt L
+    {1, CS21_SW8,  CS20_SW8,  CS19_SW8}, // Ctrl
+    {1, CS21_SW9,  CS20_SW9,  CS19_SW9}, // Win
+    {1, CS18_SW9,  CS17_SW9,  CS16_SW9}, // Alt L
     //{1, CS3_SW9,   CS2_SW9,   CS1_SW9},// Space L
-    {1, CS6_SW9,   CS5_SW9,   CS4_SW9},  // Space M
+    {1, CS12_SW9,  CS11_SW9,  CS10_SW9},  // Space M
     //{1, CS9_SW9,   CS8_SW9,   CS7_SW9},// Space R
-    {1, CS12_SW9,  CS11_SW9,  CS10_SW9}, // Fn
-    {1, CS12_SW8,  CS11_SW8,  CS10_SW8}, // Alt R
-    {1, CS15_SW9,  CS14_SW9,  CS13_SW9}, // Win
-    {1, CS15_SW8,  CS14_SW8,  CS13_SW8}, // Left
-    {1, CS18_SW9,  CS17_SW9,  CS16_SW9}, // Down
-    {1, CS18_SW8,  CS17_SW8,  CS16_SW8}, // Right
-    {1, CS21_SW9,  CS20_SW9,  CS19_SW9}, // F5
-    {1, CS21_SW8,  CS20_SW8,  CS19_SW8}  // F10
+    {1,  CS6_SW9,   CS5_SW9,   CS4_SW9}, // Fn
+    {1,  CS6_SW8,   CS5_SW8,   CS4_SW8}, // Alt R
+    {1,  CS9_SW9,   CS8_SW9,   CS7_SW9}, // Win
+    {1,  CS9_SW8,   CS8_SW8,   CS7_SW8}, // Left
+    {1, CS39_SW9,  CS38_SW9,  CS37_SW9}, // Down
+    {1, CS39_SW8,  CS38_SW8,  CS37_SW8}, // Right
+    {1, CS36_SW9,  CS35_SW9,  CS34_SW9}, // F5
+    {1, CS36_SW8,  CS35_SW8,  CS34_SW8}  // F10
 };
 
 led_config_t g_led_config = { {
   // Key Matrix to LED Index
   {   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, __ },
-//   {  __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-//   {  __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-//   {  __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ },
-//   {  __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __ }
   {  17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, __ },
   {  34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, __, 47, 48, 49, __ },
   {  50, 51, 52, 53, 54, 55, 56, 57, 58, 59, __, 60, 61, 62, 63, 64, 65, __ },

@@ -288,3 +288,13 @@ void is31fl3741_flush(void) {
         is31fl3741_update_pwm_buffers(i);
     }
 }
+
+uint8_t IS31FL3741_get_pwm(uint8_t driver_id, uint8_t index) {
+    return get_pwm_value(driver_id, index);
+    // return g_pwm_buffer[driver_id][index];
+}
+
+uint8_t IS31FL3741_get_scaling(uint8_t driver_id, uint8_t index) {
+    return driver_buffers[driver_id].scaling_buffer_0[index];
+    // return g_scaling_registers[driver_id][index];
+}
