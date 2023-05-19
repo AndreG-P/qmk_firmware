@@ -51,6 +51,9 @@ void IS31FL3741_set_scaling_registers(const is31_led *pled, uint8_t red, uint8_t
 
 void IS31FL3741_set_pwm_buffer(const is31_led *pled, uint8_t red, uint8_t green, uint8_t blue);
 
+uint8_t IS31FL3741_get_pwm(uint8_t driver_id, uint8_t index);
+uint8_t IS31FL3741_get_scaling(uint8_t driver_id, uint8_t index);
+
 #define PUR_0R 0x00   // No PUR resistor
 #define PUR_05KR 0x01 // 0.5k Ohm resistor
 #define PUR_1KR 0x02  // 1.0k Ohm resistor
