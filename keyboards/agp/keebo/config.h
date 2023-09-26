@@ -16,7 +16,7 @@
 #define MATRIX_COL_PINS { C9,  C8,  C7,  C6, B15, B14, B13, B12, B10, B2, B1, B0, C5, C4, A7, A6, A5, A4 }
 
 #define DIODE_DIRECTION COL2ROW
-#define DEBOUNCE    2
+#define DEBOUNCE    5
 
 #define ENCODERS_PAD_A { C1, C13 }
 #define ENCODERS_PAD_B { C2, C14 }
