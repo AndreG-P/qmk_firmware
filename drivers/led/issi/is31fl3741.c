@@ -89,6 +89,7 @@ bool    g_pwm_buffer_update_required[DRIVER_COUNT]        = {false};
 bool    g_scaling_registers_update_required[DRIVER_COUNT] = {false};
 
 uint8_t g_scaling_registers[DRIVER_COUNT][ISSI_MAX_LEDS];
+uint8_t buffer_size = 180/10; // this number must divide 180 since the first pages of regs are 180 leds
 
 void IS31FL3741_write_register(uint8_t addr, uint8_t reg, uint8_t data) {
     g_twi_transfer_buffer[0] = reg;
@@ -108,7 +109,9 @@ bool IS31FL3741_write_pwm_buffer(uint8_t addr, uint8_t *pwm_buffer) {
     IS31FL3741_write_register(addr, ISSI_COMMANDREGISTER_WRITELOCK, 0xC5);
     IS31FL3741_write_register(addr, ISSI_COMMANDREGISTER, ISSI_PAGE_PWM0);
 
-    for (int i = 0; i < ISSI_MAX_LEDS; i += 18) {
+    int i = 0;
+    while ( i < ISSI_MAX_LEDS - buffer_size ) {
+    // for (int i = 0; i < ISSI_MAX_LEDS - buffer_size; i += buffer_size) {
         if (i == 180) {
             // unlock the command register and select PG2
             IS31FL3741_write_register(addr, ISSI_COMMANDREGISTER_WRITELOCK, 0xC5);
@@ -116,33 +119,37 @@ bool IS31FL3741_write_pwm_buffer(uint8_t addr, uint8_t *pwm_buffer) {
         }
 
         g_twi_transfer_buffer[0] = i % 180;
-        memcpy(g_twi_transfer_buffer + 1, pwm_buffer + i, 18);
+        memcpy(g_twi_transfer_buffer + 1, pwm_buffer + i, buffer_size);
 
 #if ISSI_PERSISTENCE > 0
         for (uint8_t i = 0; i < ISSI_PERSISTENCE; i++) {
-            if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 19, ISSI_TIMEOUT) != 0) {
+            if (i2c_transmit(addr << 1, g_twi_transfer_buffer, buffer_size + 1, ISSI_TIMEOUT) != 0) {
                 return false;
             }
         }
 #else
-        if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 19, ISSI_TIMEOUT) != 0) {
+        if (i2c_transmit(addr << 1, g_twi_transfer_buffer, buffer_size + 1, ISSI_TIMEOUT) != 0) {
             return false;
         }
 #endif
+        i += buffer_size;
     }
 
     // transfer the left cause the total number is 351
-    g_twi_transfer_buffer[0] = 162;
-    memcpy(g_twi_transfer_buffer + 1, pwm_buffer + 342, 9);
+    // g_twi_transfer_buffer[0] = 162;
+    // memcpy(g_twi_transfer_buffer + 1, pwm_buffer + 342, 9);
+
+    g_twi_transfer_buffer[0] = i - 180; // 162;
+    memcpy(g_twi_transfer_buffer + 1, pwm_buffer + i, ISSI_MAX_LEDS - i);
 
 #if ISSI_PERSISTENCE > 0
     for (uint8_t i = 0; i < ISSI_PERSISTENCE; i++) {
-        if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 10, ISSI_TIMEOUT) != 0) {
+        if (i2c_transmit(addr << 1, g_twi_transfer_buffer, ISSI_MAX_LEDS - i + 1, ISSI_TIMEOUT) != 0) {
             return false;
         }
     }
 #else
-    if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 10, ISSI_TIMEOUT) != 0) {
+    if (i2c_transmit(addr << 1, g_twi_transfer_buffer, ISSI_MAX_LEDS - i + 1, ISSI_TIMEOUT) != 0) {
         return false;
     }
 #endif

@@ -3,6 +3,7 @@
 #include "is31fl3741.h"
 #include "print.h"
 
+#ifndef ENCODER_MAP_ENABLE
 bool encoder_update_kb(uint8_t index, bool clockwise) {
     if (index == 0) { /* First encoder */
         if (clockwise) {
@@ -19,11 +20,10 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
     }
     return true;
 }
+#endif // ENCODER_MAP_ENABLE
 
 #ifdef RGB_MATRIX_ENABLE
-
-// THEORETISCH 136
-#define CAPS_LOCK_LED_INDEX { 34, 136, 117 }
+#define CAPS_LOCK_LED_INDEX { 34, 136 }
 #define NUM_CAPS_LOCK_LEDS ARRAY_SIZE(((int[])CAPS_LOCK_LED_INDEX))
 
 #ifdef RGB_MATRIX_MAXIMUM_BRIGHTNESS
@@ -53,9 +53,9 @@ bool rgb_matrix_indicators_kb(void) {
         } else {
             b = CAPS_LOCK_MAX_BRIGHTNESS;
 
-            uint8_t pwm = IS31FL3741_get_pwm(1, 117);
-            uint8_t scaling = IS31FL3741_get_scaling(1, 117);
-            uprintf( "LED 117 PWM: 0x%02X and Scaling: 0x%02X\n", pwm, scaling );
+            // uint8_t pwm = IS31FL3741_get_pwm(1, 117);
+            // uint8_t scaling = IS31FL3741_get_scaling(1, 117);
+            // uprintf( "LED 117 PWM: 0x%02X and Scaling: 0x%02X\n", pwm, scaling );
         }
         for ( uint8_t led_idx = 0; led_idx < NUM_CAPS_LOCK_LEDS; led_idx++ ) {
             rgb_matrix_set_color(caps_leds[led_idx], b, b, b); // white, with the adjusted brightness
@@ -343,5 +343,19 @@ led_config_t g_led_config = { {
   LED_FLAG_MODIFIER,   LED_FLAG_KEYLIGHT, LED_FLAG_KEYLIGHT, LED_FLAG_KEYLIGHT, LED_FLAG_KEYLIGHT, LED_FLAG_KEYLIGHT, LED_FLAG_KEYLIGHT, LED_FLAG_KEYLIGHT, LED_FLAG_KEYLIGHT, LED_FLAG_KEYLIGHT, LED_FLAG_KEYLIGHT,               LED_FLAG_MODIFIER, LED_FLAG_MODIFIER, LED_FLAG_MODIFIER,    LED_FLAG_MODIFIER, LED_FLAG_MODIFIER,
   LED_FLAG_MODIFIER,   LED_FLAG_MODIFIER, LED_FLAG_MODIFIER, LED_FLAG_KEYLIGHT, LED_FLAG_MODIFIER, LED_FLAG_MODIFIER, LED_FLAG_MODIFIER, LED_FLAG_MODIFIER, LED_FLAG_MODIFIER, LED_FLAG_MODIFIER, LED_FLAG_MODIFIER, LED_FLAG_MODIFIER
 } };
+
+#ifdef ADDITIONAL_LED_PER_KEY
+uint8_t g_led_config_key_refs[MATRIX_ROWS][MATRIX_COLS] = {
+  { 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, __ },
+  { 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, __ },
+  { 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148,  __, 149, 150, 151, __ },
+  { 152, 153, 154, 155, 156, 157, 158, 159, 160, 161,  __, 162, 163, 164, 165, 166, 167, __ },
+  { 168, 169, 170, 171,  __,  __,  __, 172,  __, 173,  __, 174, 175, 176, 177, 178, 179, __ }
+};
+
+uint8_t rgb_matrix_map_row_column_to_led_kb(uint8_t row, uint8_t column, uint8_t *led_i) {
+    return 1;
+}
+#endif // ADDITIONAL_LED_PER_KEY
 
 #endif // RGB_MATRIX_ENABLE
